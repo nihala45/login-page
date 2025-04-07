@@ -48,6 +48,10 @@ def login(request):
         try:
             user = CustomUser.objects.get(email=email, password=password)
             if user and not user.is_blocked:
+                
+                request.session['email']=email
+                request.session['phone'] = user.phone 
+                request.session['username'] = user.username
                 return JsonResponse({'status':'success'})
                 
                
@@ -65,6 +69,6 @@ def login(request):
 
 
 def logout(request):
-    print('go to work')
-    auth_logout(request)  # <-- this logs the user out properly
-    return redirect('login')
+    auth_logout(request)            
+    request.session.flush()         
+    return redirect('login_page') 
