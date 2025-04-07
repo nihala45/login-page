@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f2f2f2;
+        }
+
+        header {
+            background-color: #4CAF50;
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        main {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .content-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .content-box h2 {
+            color: #333;
+        }
+
+        .content-box p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Homepage</h1>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
+    </header>
+
+    <main>
+        <div class="content-box">
+            <h2>Hello,</h2>
+            <p>This is your home page. You can add more content here as needed.</p>
+        </div>
+    </main>
+
+</body>
+</html>

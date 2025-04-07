@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-box button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>Login</h2>
+        <form id="signin-form" onsubmit="SignIn(event)">
+            {% csrf_token %}
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <p id="error-message" class="text-danger"></p>
+        
+            <label for="singin-email">Email address *</label>
+            <input type="email" class="form-control" id="signin-email" name="singin-email" required>
+        
+            <label for="singin-password">Password *</label>
+            <input type="password" class="form-control" id="signin-password" name="singin-password" required>
+        
+            <button type="submit" class="btn btn-outline-primary-2">
+                <span>LOG IN</span>
+                <i class="icon-long-arrow-right"></i>
+            </button>
+        
+        
+            <a href="#" class="forgot-link"> Forgot Your Password?</a>
+        </form>
+    </div>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        function SignIn(e) {
+            e.preventDefault();
+            let user_email = document.getElementById('signin-email').value;
+            let user_password = document.getElementById('signin-password').value;
+        
+            const csrftoken = getCookie('csrftoken');
+            let formData = new URLSearchParams();
+            formData.append('user_email', user_email);
+            formData.append('user_password', user_password);
+           
+            fetch('{% url "login" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: formData.toString()
+            })
+            
+            .then(response=>response.json())
+            .then(data =>{
+                console.log('this is good for hadr')
+                if(data.status=='block'){
+                    document.getElementById('error-message').textContent=data.message
+    
+                }else if(data.status=='wrong'){
+                    document.getElementById('error-message').textContent=data.message
+    
+                }else{
+                    location.href = '{% url "home" %}';
+                }
+                
+            })
+        }
+    </script>
+
+</body>
+</html>

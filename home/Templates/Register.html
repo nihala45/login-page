@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-box {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-box button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-box">
+        <h2>Register</h2>
+        <form id="register-form" onsubmit="RegisterValidation(event)">
+            {% csrf_token %}
+            <div class="form-group">
+                <p id="error-username" class="text-danger"></p>
+
+                <label for="register-username">Username*</label>
+                <input type="text" class="form-control" id="register-username" name="register-username" required>
+            </div>
+            <div class="form-group">
+                <p id="error-email" class="text-danger"></p>
+                <label for="register-email">Your email address*</label>
+                <input type="email" class="form-control" id="register-email" name="register-email" required>
+            </div>
+    
+            <div class="form-group">
+                <p id="error-phone" class="text-danger"></p>
+                <label for="register-phone">Phone number *</label>
+                <input type="text" class="form-control" id="register-phone" name="register-phone" required>
+            </div>
+    
+            <div class="form-group">
+                <p id="error-password" class="text-danger"></p>
+                <label for="register-password">Password *</label>
+                <input type="password" class="form-control" id="register-password" name="register-password" required>
+            </div>
+    
+            <div class="form-group">
+                <p id="error-confirm" class="text-danger"></p>
+                <label for="register-confirm-password">Confirm Password *</label>
+                <input type="password" class="form-control" id="register-confirm-password" name="register-confirm-password" required>
+            </div>
+    
+            <div class="form-footer">
+                <button type="submit" class="btn btn-outline-primary-2">
+                    <span>SIGN UP</span>
+                    <i class="icon-long-arrow-right"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function RegisterValidation(e) {
+            e.preventDefault();
+            console.log("Form submission started");
+        
+            
+            document.getElementById('error-phone').textContent = '';
+            document.getElementById('error-password').textContent = '';
+            document.getElementById('error-confirm').textContent = '';
+            document.getElementById('error-email').textContent = '';
+            document.getElementById('error-username').textContent = '';
+        
+            
+            let user_username = document.getElementById('register-username').value.trim();
+            let user_email = document.getElementById('register-email').value.trim();
+            let user_phone = document.getElementById('register-phone').value.trim();
+            let user_password = document.getElementById('register-password').value;
+            let user_confirm = document.getElementById('register-confirm-password').value;
+        
+           
+            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>]).{8,}$/;
+        
+            let zeroCount = (user_phone.match(/0/g) || []).length;
+        
+            
+            let isValid = true;
+        
+            if (user_phone.length !== 10 || zeroCount > 5) {
+                document.getElementById('error-phone').textContent = 'Please enter a valid 10-digit phone number.';
+                isValid = false;
+            }
+        
+            if (!passwordRegex.test(user_password)) {
+                document.getElementById('error-password').textContent = 'Password must include at least one uppercase letter, one lowercase letter, one number, one symbol, and be more than 8 characters long.';
+                isValid = false;
+            }
+        
+            if (user_password !== user_confirm) {
+                document.getElementById('error-confirm').textContent = 'Passwords do not match. Please try again.';
+                isValid = false;
+            }
+        
+            if (/^\d/.test(user_username)) {
+                document.getElementById('error-username').textContent = 'Username cannot start with a number.';
+                isValid = false;
+            }
+        
+            if (/^\s/.test(user_username)) {
+                document.getElementById('error-username').textContent = 'Username cannot start with a space.';
+                isValid = false;
+            }
+            if (user_username ==='') {
+                document.getElementById('error-username').textContent = 'Username cannot start with a space.';
+                isValid = false;
+            }
+        
+            
+            if (isValid) {
+                console.log("Form validation passed");
+        
+                const csrftoken = getCookie('csrftoken');
+                let formData = new URLSearchParams();
+                formData.append('user_username', user_username);
+                formData.append('user_email', user_email);
+                formData.append('user_phone', user_phone);
+                formData.append('user_password', user_password);
+                formData.append('user_confirm', user_confirm);
+        
+                fetch("{% url 'signup' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: formData.toString()
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'already') {
+                        document.getElementById('error-email').textContent = data.message;
+                    } else if (data.status === 'success') {
+                        window.location.href = data.redirect_url;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        }
+        
+
+    </script>
+
+</body>
+</html>
